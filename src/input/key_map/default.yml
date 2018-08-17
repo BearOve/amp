@@ -64,6 +64,8 @@ normal:
   "<": buffer::outdent_line
   "=": git::add
   escape: view::scroll_cursor_to_center
+  home: cursor::move_to_start_of_line
+  end: cursor::move_to_end_of_line
   page_up: view::scroll_up
   page_down: view::scroll_down
   space: application::switch_to_open_mode
