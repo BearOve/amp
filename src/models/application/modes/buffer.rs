@@ -10,6 +10,7 @@ use models::application::modes::{SearchSelectMode, SearchSelectConfig};
 pub struct BufferEntry {
     pub id: usize,
     pub path: Option<PathBuf>,
+    pub is_modified: bool,
     search_str: String,
 }
 
@@ -21,12 +22,19 @@ impl fragment::matching::AsStr for BufferEntry {
 
 impl ::std::fmt::Display for BufferEntry {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        write!(f, "#{} {}", self.id, self.search_str)
+        let state;
+        if self.is_modified {
+            state = "* ";
+        } else {
+            state = "  ";
+        }
+        write!(f, "{}#{:<3} {}", state, self.id, self.search_str)
     }
 }
 
 pub struct BufferMode {
     insert: bool,
+    empty_msg: String,
     input: String,
     buffers: Vec<BufferEntry>,
     results: SelectableVec<BufferEntry>,
@@ -41,16 +49,27 @@ impl BufferMode {
             let path = buffer.get_path().map(|p| PathBuf::from(p));
             let search_str = path.as_ref().map(|p| p.to_string_lossy().into())
                 .unwrap_or_else(|| "<not named>".into());
-            BufferEntry { id, path, search_str }
+            let is_modified = buffer.modified();
+            BufferEntry { id, path, is_modified, search_str }
         }).collect();
 
         BufferMode {
             insert: true,
+            empty_msg: "No buffers are open.".into(),
             input: String::new(),
             buffers,
             results: SelectableVec::new(Vec::new()),
             config,
         }
+    }
+
+    pub fn apply_filter<F: FnMut(&BufferEntry) -> bool>(&mut self, msg: String, mut f: F) {
+        // Note: It would be more perfomant to perfom the filtering during new, but
+        // it seems unlikely it matters in this case.
+        let mut buffers = Vec::new();
+        ::std::mem::swap(&mut buffers, &mut self.buffers);
+        self.buffers.extend(buffers.into_iter().filter(|e| f(e)));
+        self.empty_msg = msg;
     }
 }
 
@@ -118,7 +137,7 @@ impl SearchSelectMode<BufferEntry> for BufferMode {
         if !self.results.is_empty() {
             None
         } else if self.input.is_empty() {
-            Some(String::from("No buffers are open."))
+            Some(self.empty_msg.clone())
         } else {
             Some(String::from("No matching entries found."))
         }
