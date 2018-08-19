@@ -35,15 +35,21 @@ pub fn accept(app: &mut Application) -> Result {
                 .selection()
                 .ok_or("No buffer selected")?;
 
-            if let Some(ref path) = selection.path {
-                app.workspace
-                    .open_buffer(&path)
-                    .chain_err(|| "Couldn't open buffer that existed when the search started")?;
-            } else {
-                return Err("ToDo: Select the buffer by id as it doesn't have a path".into());
+            let mut found_buffer_id = None;
+            for buffer in app.workspace.iter_buffers() {
+                if buffer.id.unwrap() == selection.id {
+                    buffer.make_current();
+                    found_buffer_id = Some(selection.id);
+                    break;
+                }
             }
 
-            app.view.initialize_buffer(app.workspace.current_buffer().unwrap())?;
+            if found_buffer_id.is_some() {
+                let buffer = app.workspace.current_buffer().unwrap();
+                app.view.initialize_buffer(buffer)?;
+            } else {
+                return Err("Failed to locate the selected buffer".into());
+            }
         },
         Mode::Theme(ref mut mode) => {
             let theme_key = mode.selection().ok_or("No theme selected")?;

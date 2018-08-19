@@ -36,9 +36,9 @@ pub struct BufferMode {
 impl BufferMode {
     pub fn new(workspace: &mut Workspace, config: SearchSelectConfig) -> BufferMode {
         // ToDo: This code assumes the id is _ALWAYS_ valid in a workspace
-        let buffers: Vec<_> = workspace.iter_buffers().map(|entry| {
-            let id = entry.buffer.id.unwrap();
-            let path = entry.get_path().map(|p| PathBuf::from(p));
+        let buffers: Vec<_> = workspace.iter_buffers().map(|buffer| {
+            let id = buffer.id.unwrap();
+            let path = buffer.get_path().map(|p| PathBuf::from(p));
             let search_str = path.as_ref().map(|p| p.to_string_lossy().into())
                 .unwrap_or_else(|| "<not named>".into());
             BufferEntry { id, path, search_str }
