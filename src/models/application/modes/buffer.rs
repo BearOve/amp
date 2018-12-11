@@ -1,10 +1,10 @@
 use std::slice::Iter;
 use std::fmt;
 use std::path::PathBuf;
-use util::SelectableVec;
+use crate::util::SelectableVec;
 use scribe::Workspace;
 use fragment;
-use models::application::modes::{SearchSelectMode, SearchSelectConfig};
+use crate::models::application::modes::{SearchSelectMode, SearchSelectConfig};
 
 #[derive(Clone)]
 pub struct BufferEntry {
