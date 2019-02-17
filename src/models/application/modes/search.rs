@@ -1,19 +1,20 @@
 use crate::errors::*;
 use crate::util::SelectableVec;
+use crate::input::history::InputHistoryRef;
 use std::fmt;
 use scribe::buffer::{Buffer, Distance, Range};
 
 pub struct SearchMode {
     pub insert: bool,
-    pub input: Option<String>,
+    pub input: InputHistoryRef,
     pub results: Option<SelectableVec<Range>>,
 }
 
 impl SearchMode {
-    pub fn new(query: Option<String>) -> SearchMode {
+    pub fn new(input: InputHistoryRef) -> SearchMode {
         SearchMode {
             insert: true,
-            input: query,
+            input,
             results: None,
         }
     }
@@ -53,14 +54,16 @@ impl fmt::Display for SearchMode {
 #[cfg(test)]
 mod tests {
     use scribe::buffer::{Buffer, Position, Range};
+    use crate::input::history::InputHistory;
     use super::SearchMode;
 
     #[test]
     fn search_populates_results_with_correct_ranges() {
+        let search_history = InputHistory::new(0);
         let mut buffer = Buffer::new();
         buffer.insert("test\ntest");
 
-        let mut mode = SearchMode::new(Some(String::from("test")));
+        let mut mode = SearchMode::new(search_history.make_ref(Some(String::from("test"))));
         mode.search(&buffer).unwrap();
 
         assert_eq!(

@@ -151,6 +151,8 @@ search_insert:
   enter: search::accept_query
   backspace: search::pop_search_char
   escape: application::switch_to_normal_mode
+  up: search::prev_query
+  down: search::next_query
   ctrl-z: application::suspend
   ctrl-c: application::exit
 

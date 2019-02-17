@@ -16,7 +16,7 @@ pub fn display(workspace: &mut Workspace, mode: &SearchMode, view: &mut View) ->
     let mode_display = format!(" {} ", mode);
     let search_input = format!(
         " {}",
-        mode.input.as_ref().unwrap_or(&String::new())
+        mode.input.as_ref().unwrap_or_default()
     );
     let result_display = if mode.insert {
         String::new()

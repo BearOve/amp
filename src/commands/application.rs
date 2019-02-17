@@ -180,7 +180,7 @@ pub fn switch_to_select_line_mode(app: &mut Application) -> Result {
 pub fn switch_to_search_mode(app: &mut Application) -> Result {
     if app.workspace.current_buffer().is_some() {
         app.mode = Mode::Search(
-            SearchMode::new(app.search_query.clone())
+            SearchMode::new(app.search_history.make_ref(app.search_query.clone()))
         );
     } else {
         bail!(BUFFER_MISSING);
@@ -314,7 +314,7 @@ mod tests {
         super::switch_to_search_mode(&mut app).unwrap();
 
         let mode_query = match app.mode {
-            Mode::Search(ref mode) => mode.input.clone(),
+            Mode::Search(ref mode) => mode.input.as_ref().map(|s| s.into_owned()),
             _ => None,
         };
         assert_eq!(
