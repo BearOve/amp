@@ -1,6 +1,7 @@
 pub use self::key_map::KeyMap;
 
 mod key_map;
+pub mod history;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Key {

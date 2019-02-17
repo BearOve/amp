@@ -22,6 +22,10 @@ use std::path::Path;
 use std::rc::Rc;
 use std::sync::mpsc::{self, Receiver, Sender};
 use crate::view::View;
+use std::sync::Arc;
+use crate::view::terminal::*;
+use crate::view::{self, StatusLineData, View};
+use crate::input::history::InputHistory;
 
 pub enum Mode {
     Confirm(ConfirmMode),
@@ -46,6 +50,7 @@ pub struct Application {
     pub mode: Mode,
     pub workspace: Workspace,
     pub search_query: Option<String>,
+    pub search_history: InputHistory,
     pub view: View,
     pub clipboard: Clipboard,
     pub repository: Option<Repository>,
@@ -70,6 +75,7 @@ impl Application {
             mode: Mode::Normal,
             workspace,
             search_query: None,
+            search_history: InputHistory::new(4096), // ToDo: From config?
             view,
             clipboard,
             repository: Repository::discover(&env::current_dir()?).ok(),
