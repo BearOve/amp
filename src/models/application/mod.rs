@@ -23,8 +23,6 @@ use std::rc::Rc;
 use std::sync::mpsc::{self, Receiver, Sender};
 use crate::view::View;
 use std::sync::Arc;
-use crate::view::terminal::*;
-use crate::view::{self, StatusLineData, View};
 use crate::input::history::InputHistory;
 
 pub enum Mode {
